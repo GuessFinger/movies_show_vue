@@ -1,10 +1,24 @@
 <script setup>
-import {watch} from "vue";
+import {reactive, watch} from "vue";
+// todo
+import {queryPerformerDetailByName} from "@/axios/requestList.js";
 
 const visibleObject = defineProps(['visible', 'performerName']);
 defineEmits(['handleOk']);
 
-watch(() => visibleObject.performerName, () => {
+const performerDetail = reactive({});
+
+const queryPerformerInfo = performerName => {
+
+};
+
+watch(() => visibleObject.performerName, async () => {
+  try {
+    const result = await queryPerformerDetailByName(visibleObject.performerName);
+    console.log(result);
+  }catch(error) {
+    console.log(error);
+  }
   console.log('hello wall');
 });
 
