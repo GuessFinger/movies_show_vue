@@ -5,3 +5,6 @@ export const queryPerformerList =
 
 export const queryPerformerDetailByName =
     performerName => instance.get(`/max/queryPerformerDetailByName?performerName=${performerName}`);
+
+export const savePerformerInfo =
+    performerInfoObject => instance.post('/max/savePerformerInfo', performerInfoObject);
