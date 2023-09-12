@@ -3,7 +3,7 @@ import {reactive, watch} from "vue";
 import {queryPerformerDetailByName, savePerformerInfo} from "@/axios/requestList.js";
 
 const visibleObject = defineProps(['visible', 'performerName']);
-defineEmits(['handleOk']);
+const emits = defineEmits(['handleOk', 'resetList']);
 
 let productionList = reactive([]);
 let failLoadList = reactive([]);
@@ -24,10 +24,12 @@ const savePerformer = () => {
     performerName: visibleObject.performerName,
     productList: productionList
   }).then(res => {
-    console.log(res);
+    if (res?.code === 200) {
+      // 关闭当前窗口 然后重置查询动作
+      emits('resetList');
+    }
   });
 };
-
 
 </script>
 

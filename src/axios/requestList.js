@@ -8,3 +8,10 @@ export const queryPerformerDetailByName =
 
 export const savePerformerInfo =
     performerInfoObject => instance.post('/max/savePerformerInfo', performerInfoObject);
+
+export const queryPerformerListById =
+    performerId => instance.get(`/max/queryPerformerProductListById?id=${performerId}`);
+
+export const queryMoviePlots =
+    (performerId, num) =>
+        instance.get(`/max/queryMoviePlots?id=${performerId}&num=${num}`)

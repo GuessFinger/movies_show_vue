@@ -2,7 +2,9 @@
 import {onMounted, reactive, ref} from "vue";
 import {queryPerformerList} from "../axios/requestList.js";
 import performerDetail from './modal/performerDetail.vue'
+import {useRouter} from "vue-router";
 
+const router = useRouter();
 let savedPerformerList = reactive([]);
 let unsavedPerformerList = reactive([]);
 
@@ -11,6 +13,8 @@ onMounted(() => {
 });
 const queryPerformer = async () => {
   const [savedList, unsavedList] = await queryPerformerList();
+  savedPerformerList.length = 0;
+  unsavedPerformerList.length = 0;
   savedPerformerList.push(...savedList);
   unsavedPerformerList.push(...unsavedList);
 };
@@ -26,6 +30,15 @@ const hiddenPerformerDetail = () => {
   visible.value = false;
 }
 
+const resetCurrentList = () => {
+  visible.value = false;
+  queryPerformer();
+};
+
+const changeRouter = (performerId) => {
+  router.push({name: 'performer', params: {id: performerId}});
+};
+
 </script>
 
 <template>
@@ -34,17 +47,21 @@ const hiddenPerformerDetail = () => {
     <div class="title_container">
       saved performer
     </div>
-    <div>
-      <a-card hoverable style="width: 240px">
+    <div style="display: flex;flex-wrap: wrap;">
+      <a-card hoverable style="width: 250px;margin: 10px;"
+              v-for="performer in savedPerformerList" :key="performer.id">
         <template #cover>
-          <img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"/>
+          <img alt="example" :src="performer.imagePath"
+               class="image_item"
+               @click="changeRouter(performer.id)"/>
         </template>
-        <a-card-meta title="Europe Street beat">
-          <template #description>www.instagram.com</template>
+        <a-card-meta :title="performer.performerName">
+          <template #description>www.cctv.com</template>
         </a-card-meta>
       </a-card>
     </div>
   </div>
+
   <!-- 暂时还没有添加到数据库里面  -->
   <div class="unsaved_performer">
     <div class="title_container">
@@ -64,7 +81,9 @@ const hiddenPerformerDetail = () => {
   <performer-detail
       :visible="visible"
       :performer-name="performerName"
-      @handle-ok="hiddenPerformerDetail"/>
+      @handle-ok="hiddenPerformerDetail"
+      @reset-list="resetCurrentList"
+  />
 </template>
 
 <style scoped>
@@ -76,6 +95,12 @@ const hiddenPerformerDetail = () => {
 .saved_performer {
   width: 100%;
   height: 50%;
+
+  .image_item {
+    width: 250px;
+    height: 340px;
+  }
+
 }
 
 .unsaved_performer {
