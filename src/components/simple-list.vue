@@ -3,10 +3,12 @@ import {onMounted, reactive, ref} from "vue";
 import {queryPerformerList} from "../axios/requestList.js";
 import performerDetail from './modal/performerDetail.vue'
 import {useRouter} from "vue-router";
+import {performerHotUseStore} from "@/store/degreeOfHeat.js";
 
 const router = useRouter();
 let savedPerformerList = reactive([]);
 let unsavedPerformerList = reactive([]);
+const hotUseStore = performerHotUseStore();
 
 onMounted(() => {
   queryPerformer();
@@ -37,43 +39,49 @@ const resetCurrentList = () => {
 
 const changeRouter = (performerId) => {
   router.push({name: 'performer', params: {id: performerId}});
+  hotUseStore.addHot(performerId, 10);
 };
 
 </script>
 
 <template>
-  <!-- 已经存储到数据库的列表 -->
-  <div class="saved_performer">
-    <div class="title_container">
-      saved performer
-    </div>
-    <div style="display: flex;flex-wrap: wrap;">
-      <a-card hoverable style="width: 250px;margin: 10px;"
-              v-for="performer in savedPerformerList" :key="performer.id">
-        <template #cover>
-          <img alt="example" :src="performer.imagePath"
-               class="image_item"
-               @click="changeRouter(performer.id)"/>
-        </template>
-        <a-card-meta :title="performer.performerName">
-          <template #description>www.cctv.com</template>
-        </a-card-meta>
-      </a-card>
-    </div>
+  <div class="title_container">
+    内容展示
   </div>
-
-  <!-- 暂时还没有添加到数据库里面  -->
-  <div class="unsaved_performer">
-    <div class="title_container">
-      unsaved performer
+  <div class="list_container">
+    <!-- 已经存储到数据库的列表 -->
+    <div class="saved_performer">
+      <div class="title_container">
+        saved performer
+      </div>
+      <div style="display: flex;flex-wrap: wrap;">
+        <a-card hoverable style="width: 250px;margin: 10px;"
+                v-for="performer in savedPerformerList" :key="performer.id">
+          <template #cover>
+            <img alt="example" :src="performer.imagePath"
+                 class="image_item"
+                 @click="changeRouter(performer.id)"/>
+          </template>
+          <a-card-meta :title="performer.performerName">
+            <template #description>www.cctv.com</template>
+          </a-card-meta>
+        </a-card>
+      </div>
     </div>
-    <div class="name_container">
-      <div v-for="performer in unsavedPerformerList"
-           :key="performer"
-           class="util_container">
-        <a href="#" @click.prevent="showPerformerDetail(performer)">
-          {{ performer }}
-        </a>
+
+    <!-- 暂时还没有添加到数据库里面  -->
+    <div class="unsaved_performer">
+      <div class="title_container">
+        unsaved performer
+      </div>
+      <div class="name_container">
+        <div v-for="performer in unsavedPerformerList"
+             :key="performer"
+             class="util_container">
+          <a href="#" @click.prevent="showPerformerDetail(performer)">
+            {{ performer }}
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -84,9 +92,27 @@ const changeRouter = (performerId) => {
       @handle-ok="hiddenPerformerDetail"
       @reset-list="resetCurrentList"
   />
+
 </template>
 
 <style scoped>
+.title_container {
+  margin-top: 50px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 50px;
+  height: 100px;
+}
+
+.list_container {
+  width: 100%;
+  margin: 50px;
+  min-height: 50px;
+}
+
+
 .title_container {
   font-size: 30px;
   padding: 15px;

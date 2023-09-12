@@ -4,25 +4,41 @@ import {Pagination} from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import {useRoute} from "vue-router";
-import {reactive, watch} from "vue";
+import {onMounted, reactive, watch} from "vue";
 import {queryMoviePlots} from "@/axios/requestList.js";
+import {performerHotUseStore} from "@/store/degreeOfHeat.js";
 
 const route = useRoute();
 const modules = [Pagination];
 const plots = reactive([]);
+const hotUseStore = performerHotUseStore();
+// 开始计时点
+let startSeconds, endSeconds;
+// swiper对象
 let swiperObject;
+// 基准计分点
+let baseCount;
 
-watch(() => route.params.num, () => {
+const moviePlot = () => {
   const {id, num} = route.params;
   getMoviePlot(id, num);
-  console.log(swiperObject);
-  swiperObject.reachBeginning();
+}
+
+onMounted(() => {
+  moviePlot();
+});
+
+
+watch(() => route.params.num, () => {
+  moviePlot();
+  swiperObject.slideTo(0);
 });
 
 const getMoviePlot = async (id, num) => {
   const result = await queryMoviePlots(id, num);
   plots.length = 0;
   if (result.code === 200) {
+    baseCount = parseFloat(parseFloat(`${4 / result.data.length}`).toFixed(2));
     plots.push(...result.data);
   }
 };
@@ -31,11 +47,21 @@ const renderBullet = function (index, className) {
   return '<span class="' + className + '">' + (index + 1) + "</span>";
 }
 
-
-
 const onSwiper = (swiper) => {
   swiperObject = swiper;
 };
+
+// 滑动完成了以后 看一看上一个
+const swiperChangeEnd = () => {
+  let newSeconds = new Date().getTime();
+  if (startSeconds) {
+    if (newSeconds - startSeconds > 2000) {
+      console.log(baseCount);
+      hotUseStore.addHot(route.params.id, baseCount);
+    }
+  }
+  startSeconds = new Date().getTime();
+}
 
 </script>
 
@@ -51,6 +77,7 @@ const onSwiper = (swiper) => {
             renderBullet:renderBullet
         }"
         @swiper="onSwiper"
+        @slideChangeTransitionEnd="swiperChangeEnd"
         :modules="modules"
         class="mySwiper"
     >
