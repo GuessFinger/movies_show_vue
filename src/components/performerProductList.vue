@@ -6,7 +6,7 @@ import 'swiper/css/pagination';
 import {onMounted, reactive, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {queryPerformerListById} from "@/axios/requestList.js";
-import {performerHotUseStore} from "@/store/degreeOfHeat.js";
+import {performerHotUseStore} from "@/store/project_store.js";
 
 const modules = [Pagination];
 const router = useRouter();
@@ -54,7 +54,7 @@ const swiperChange = () => {
 </script>
 <template>
   <div>
-    <router-link to="/">返回首页</router-link>
+    <router-link to="/list">返回首页</router-link>
   </div>
   <div style="height: 550px;">
     <swiper

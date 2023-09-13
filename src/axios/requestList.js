@@ -1,5 +1,9 @@
 import instance from "./index.js";
 
+
+export const loginOperation =
+    loginItem => instance.post('/max/login', loginItem);
+
 export const queryPerformerList =
     () => instance.get('/max/queryPerformerList');
 

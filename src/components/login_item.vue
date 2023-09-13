@@ -1,5 +1,31 @@
 <script setup>
+import {reactive} from "vue";
+import {loginOperation} from "@/axios/requestList";
+import {baseInfoUseStore} from "@/store/project_store.js";
+import {useRouter} from "vue-router";
+import store from "store2";
 
+
+const baseInfoStore = baseInfoUseStore();
+const router = useRouter();
+
+const loginItem = reactive({
+  userName: '',
+  password: ''
+});
+
+const loginOperate = async () => {
+  const result = await loginOperation(loginItem)
+  const {code, message, token} = result;
+  if (code === '4001' || code === '4004') {
+    alert(message);
+  }
+  if (code === '200') {
+    // 这里进行跳转，并且存储token
+    store.set('token', token);
+    await router.push({path: '/list'});
+  }
+};
 </script>
 
 <template>
@@ -7,12 +33,12 @@
     <div id="login_box">
       <h2>LOGIN</h2>
       <div id="input_box">
-        <input type="text" placeholder="请输入用户名">
+        <input type="text" placeholder="请输入用户名" v-model="loginItem.userName">
       </div>
       <div class="input_box">
-        <input type="password" placeholder="请输入密码">
+        <input type="password" placeholder="请输入密码" v-model="loginItem.password">
       </div>
-      <button>登录</button>
+      <button @click="loginOperate">登录</button>
       <br>
     </div>
   </div>

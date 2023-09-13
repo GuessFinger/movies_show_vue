@@ -1,9 +1,9 @@
 <script setup>
 import {onMounted, reactive, ref} from "vue";
-import {queryPerformerList} from "../axios/requestList.js";
+import {queryPerformerList, savePerformerInfo} from "../axios/requestList.js";
 import performerDetail from './modal/performerDetail.vue'
 import {useRouter} from "vue-router";
-import {performerHotUseStore} from "@/store/degreeOfHeat.js";
+import {performerHotUseStore} from "@/store/project_store.js";
 
 const router = useRouter();
 let savedPerformerList = reactive([]);
@@ -17,6 +17,7 @@ const queryPerformer = async () => {
   const [savedList, unsavedList] = await queryPerformerList();
   savedPerformerList.length = 0;
   unsavedPerformerList.length = 0;
+  loadHotFromStore(savedList);
   savedPerformerList.push(...savedList);
   unsavedPerformerList.push(...unsavedList);
 };
@@ -42,6 +43,15 @@ const changeRouter = (performerId) => {
   hotUseStore.addHot(performerId, 10);
 };
 
+const loadHotFromStore = (savedList) => {
+  const savedPerformerHot = hotUseStore.performerHot;
+  for (const savedElement of savedList) {
+    const {id} = savedElement;
+    const score = savedPerformerHot[id];
+    savedElement['score'] = score ? score : 0;
+  }
+};
+
 </script>
 
 <template>
@@ -55,7 +65,7 @@ const changeRouter = (performerId) => {
         saved performer
       </div>
       <div style="display: flex;flex-wrap: wrap;">
-        <a-card hoverable style="width: 250px;margin: 10px;"
+        <a-card hoverable style="width: 250px;margin: 10px 20px;"
                 v-for="performer in savedPerformerList" :key="performer.id">
           <template #cover>
             <img alt="example" :src="performer.imagePath"
@@ -63,7 +73,9 @@ const changeRouter = (performerId) => {
                  @click="changeRouter(performer.id)"/>
           </template>
           <a-card-meta :title="performer.performerName">
-            <template #description>www.cctv.com</template>
+            <template #description>
+              <a-statistic title="个人热度值" :precision="2" :value="performer.score"/>
+            </template>
           </a-card-meta>
         </a-card>
       </div>
@@ -108,7 +120,6 @@ const changeRouter = (performerId) => {
 
 .list_container {
   width: 100%;
-  margin: 50px;
   min-height: 50px;
 }
 

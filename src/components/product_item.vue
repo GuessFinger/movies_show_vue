@@ -6,7 +6,7 @@ import 'swiper/css/pagination';
 import {useRoute} from "vue-router";
 import {onMounted, reactive, watch} from "vue";
 import {queryMoviePlots} from "@/axios/requestList.js";
-import {performerHotUseStore} from "@/store/degreeOfHeat.js";
+import {performerHotUseStore} from "@/store/project_store.js";
 
 const route = useRoute();
 const modules = [Pagination];

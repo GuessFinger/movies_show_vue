@@ -5,7 +5,8 @@ export const performerHotUseStore = defineStore('degreeOfHot',
     {
         state: () => {
             return {
-                performerHot: {}
+                performerHot: {},
+                token: ''
             }
         },
         getters: {},
@@ -19,3 +20,18 @@ export const performerHotUseStore = defineStore('degreeOfHot',
         }
     });
 
+
+export const baseInfoUseStore = defineStore('baseInfo', {
+    state() {
+        return {
+            token: ''
+        }
+    },
+    getters: {},
+    actions: {
+        setToken(token) {
+            this.token = token;
+            console.log(this.token);
+        }
+    },
+})
