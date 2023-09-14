@@ -61,7 +61,8 @@ router.beforeEach((to, from, next) => {
         heatUseStore = performerHeatUseStore()
       }
       // 判断 pinia 里面有没有值
-      const { performerHeat: { length } } = heatUseStore
+      const { performerHeat } = heatUseStore
+      const { length } = Object.keys(performerHeat)
       if (length === 0) {
         const savedHot = store.get('performerHeat')
         if (savedHot) heatUseStore.performerHeat = JSON.parse(savedHot)
