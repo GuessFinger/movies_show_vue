@@ -1,76 +1,74 @@
-import {createRouter, createWebHashHistory} from "vue-router";
-import simpleList from '@/components/simple-list.vue';
-import performerProductList from '@/components/performerProductList.vue';
-import productItem from '@/components/product_item.vue';
-import loginItem from '@/components/login_item.vue';
-import store from "store2";
-import {performerHotUseStore} from "@/store/project_store.js";
+import store from 'store2'
+import { createRouter, createWebHashHistory } from 'vue-router'
+import loginPage from '@/components/login-page'
+import castList from '@/components/cast-list'
+import workSummary from '@/components/work-summary'
+import workList from '@/components/work-list'
+import { performerHeatUseStore } from '@/store/heat-store.js'
 
-let hotUseStore;
-
+let heatUseStore
 
 const routes = [
-    {
-        path: '/',
-        redirect: '/list'
-    },
-    {
-        path: '/list',
-        component: simpleList,
-    },
-    {
-        name: 'performer',
-        path: '/performerDetail/:id',
-        component: performerProductList,
-        children: [
-            {
-                name: 'product',
-                path: ':num',
-                component: productItem
-            }
-        ]
-    },
-    {
-        path: '/login',
-        component: loginItem
-    }
-];
+  {
+    path: '/',
+    redirect: '/list'
+  },
+  {
+    path: '/list',
+    component: castList
+  },
+  {
+    name: 'performer',
+    path: '/performerDetail/:id',
+    component: workList,
+    children: [
+      {
+        name: 'product',
+        path: ':num',
+        component: workSummary
+      }
+    ]
+  },
+  {
+    path: '/login',
+    component: loginPage
+  }
+]
 
 const router = createRouter({
-    history: createWebHashHistory(),
-    routes,
-    scrollBehavior(to, from, savedPosition) {
-
-        return new Promise((resolve) => {
-            let savedPositionObject;
-            if (savedPosition) {
-                savedPositionObject = {behavior: 'smooth', ...savedPosition};
-            } else {
-                savedPositionObject = {top: 0};
-            }
-            setTimeout(() => resolve(savedPositionObject), 1000);
-        })
-    },
-});
+  history: createWebHashHistory(),
+  routes,
+  scrollBehavior (to, from, savedPosition) {
+    return new Promise((resolve) => {
+      let savedPositionObject
+      if (savedPosition) {
+        savedPositionObject = { behavior: 'smooth', ...savedPosition }
+      } else {
+        savedPositionObject = { top: 0 }
+      }
+      setTimeout(() => resolve(savedPositionObject), 1000)
+    })
+  }
+})
 
 router.beforeEach((to, from, next) => {
-
-    if (to.path !== '/login' && !store.get('token')) {
-        next('/login');
+  if (to.path !== '/login') {
+    // 如果store里面没有存储token直接干掉
+    if (!store.get('token')) {
+      return next('/login')
     } else {
-        if (!hotUseStore) {
-            hotUseStore = performerHotUseStore();
-        }
-
-        // 判断 pinia 里面有没有值
-        const performerHot = hotUseStore.performerHot;
-        const {length} = Object.keys(performerHot);
-        if (length === 0) {
-            const savedHot = store.get('performerHot');
-            if (savedHot) hotUseStore.performerHot = JSON.parse(savedHot);
-        }
-        next();
+      if (!heatUseStore) {
+        heatUseStore = performerHeatUseStore()
+      }
+      // 判断 pinia 里面有没有值
+      const { performerHeat: { length } } = heatUseStore
+      if (length === 0) {
+        const savedHot = store.get('performerHeat')
+        if (savedHot) heatUseStore.performerHeat = JSON.parse(savedHot)
+      }
     }
-});
+  }
+  next()
+})
 
-export default router;
+export default router

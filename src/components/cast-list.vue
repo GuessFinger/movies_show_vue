@@ -1,56 +1,54 @@
 <script setup>
-import {onMounted, reactive, ref} from "vue";
-import {queryPerformerList, savePerformerInfo} from "../axios/requestList.js";
-import performerDetail from './modal/performerDetail.vue'
-import {useRouter} from "vue-router";
-import {performerHotUseStore} from "@/store/project_store.js";
+import { onMounted, reactive, ref } from 'vue'
+import { queryPerformerList } from '../axios/requestList.js'
+import performerDetail from './modal/work-detail.vue'
+import { useRouter } from 'vue-router'
+import { performerHeatUseStore } from '@/store/heat-store.js'
 
-const router = useRouter();
-let savedPerformerList = reactive([]);
-let unsavedPerformerList = reactive([]);
-const hotUseStore = performerHotUseStore();
+const router = useRouter()
+const savedPerformerList = reactive([])
+const unsavedPerformerList = reactive([])
+const heatUseStore = performerHeatUseStore()
 
-onMounted(() => {
-  queryPerformer();
-});
+onMounted(() => { queryPerformer() })
+
 const queryPerformer = async () => {
-  const [savedList, unsavedList] = await queryPerformerList();
-  savedPerformerList.length = 0;
-  unsavedPerformerList.length = 0;
-  loadHotFromStore(savedList);
-  savedPerformerList.push(...savedList);
-  unsavedPerformerList.push(...unsavedList);
-};
-
-const visible = ref(false);
-const performerName = ref('');
-const showPerformerDetail = (name) => {
-  visible.value = true;
-  performerName.value = name;
-};
-
-const hiddenPerformerDetail = () => {
-  visible.value = false;
+  const [savedList, unsavedList] = await queryPerformerList()
+  savedPerformerList.length = 0
+  unsavedPerformerList.length = 0
+  loadHotFromStore(savedList)
+  savedPerformerList.push(...savedList)
+  unsavedPerformerList.push(...unsavedList)
 }
 
+const loadHotFromStore = (savedList) => {
+  const savedPerformerHot = heatUseStore.performerHeat
+  for (const savedElement of savedList) {
+    const { id } = savedElement
+    const score = savedPerformerHot[id]
+    savedElement.score = score || 0
+  }
+}
+
+const visible = ref(false)
+const performerName = ref('')
+
+const showPerformerDetail = (name) => {
+  visible.value = true
+  performerName.value = name
+}
+
+const hiddenPerformerDetail = () => { visible.value = false }
+
 const resetCurrentList = () => {
-  visible.value = false;
-  queryPerformer();
-};
+  visible.value = false
+  queryPerformer()
+}
 
 const changeRouter = (performerId) => {
-  router.push({name: 'performer', params: {id: performerId}});
-  hotUseStore.addHot(performerId, 10);
-};
-
-const loadHotFromStore = (savedList) => {
-  const savedPerformerHot = hotUseStore.performerHot;
-  for (const savedElement of savedList) {
-    const {id} = savedElement;
-    const score = savedPerformerHot[id];
-    savedElement['score'] = score ? score : 0;
-  }
-};
+  router.push({ name: 'performer', params: { id: performerId } })
+  heatUseStore.addHot(performerId, 10)
+}
 
 </script>
 
@@ -122,7 +120,6 @@ const loadHotFromStore = (savedList) => {
   width: 100%;
   min-height: 50px;
 }
-
 
 .title_container {
   font-size: 30px;

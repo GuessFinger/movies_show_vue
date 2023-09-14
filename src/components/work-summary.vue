@@ -1,66 +1,57 @@
 <script setup>
-import {Swiper, SwiperSlide, useSwiper} from 'swiper/vue';
-import {Pagination} from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import {useRoute} from "vue-router";
-import {onMounted, reactive, watch} from "vue";
-import {queryMoviePlots} from "@/axios/requestList.js";
-import {performerHotUseStore} from "@/store/project_store.js";
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Pagination } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/pagination'
+import { useRoute } from 'vue-router'
+import { onMounted, reactive, watch } from 'vue'
+import { queryMoviePlots } from '@/axios/requestList'
+import { performerHeatUseStore } from '@/store/heat-store'
 
-const route = useRoute();
-const modules = [Pagination];
-const plots = reactive([]);
-const hotUseStore = performerHotUseStore();
-// 开始计时点
-let startSeconds, endSeconds;
-// swiper对象
-let swiperObject;
-// 基准计分点
-let baseCount;
+const route = useRoute()
+const modules = [Pagination]
+const plots = reactive([])
+const heatUseStore = performerHeatUseStore()
+// 开始计时点,swiper对象,基准计分点
+let startSeconds, swiperObject, baseCount
 
-const moviePlot = () => {
-  const {id, num} = route.params;
-  getMoviePlot(id, num);
-}
-
-onMounted(() => {
-  moviePlot();
-});
-
+onMounted(() => { moviePlot() })
 
 watch(() => route.params.num, () => {
-  moviePlot();
-  swiperObject.slideTo(0);
-});
+  moviePlot()
+  swiperObject.slideTo(0)
+})
 
-const getMoviePlot = async (id, num) => {
-  const result = await queryMoviePlots(id, num);
-  plots.length = 0;
-  if (result.code === 200) {
-    baseCount = parseFloat(parseFloat(`${4 / result.data.length}`).toFixed(2));
-    plots.push(...result.data);
-  }
-};
-
-const renderBullet = function (index, className) {
-  return '<span class="' + className + '">' + (index + 1) + "</span>";
+const moviePlot = () => {
+  const { id, num } = route.params
+  getMoviePlot(id, num)
 }
 
-const onSwiper = (swiper) => {
-  swiperObject = swiper;
-};
+const getMoviePlot = async (id, num) => {
+  const result = await queryMoviePlots(id, num)
+  plots.length = 0
+  if (result.code === 200) {
+    baseCount = parseFloat(parseFloat(`${4 / result.data.length}`).toFixed(2))
+    plots.push(...result.data)
+  }
+}
+
+// swiper相关的函数
+const renderBullet = function (index, className) {
+  return '<span class="' + className + '">' + (index + 1) + '</span>'
+}
+
+const onSwiper = (swiper) => { swiperObject = swiper }
 
 // 滑动完成了以后 看一看上一个
 const swiperChangeEnd = () => {
-  let newSeconds = new Date().getTime();
+  const newSeconds = new Date().getTime()
   if (startSeconds) {
     if (newSeconds - startSeconds > 2000) {
-      console.log(baseCount);
-      hotUseStore.addHot(route.params.id, baseCount);
+      heatUseStore.addHot(route.params.id, baseCount)
     }
   }
-  startSeconds = new Date().getTime();
+  startSeconds = new Date().getTime()
 }
 
 </script>
@@ -113,7 +104,6 @@ const swiperChangeEnd = () => {
   height: 100%;
   object-fit: cover;
 }
-
 
 </style>
 

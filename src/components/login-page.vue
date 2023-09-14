@@ -1,31 +1,27 @@
 <script setup>
-import {reactive} from "vue";
-import {loginOperation} from "@/axios/requestList";
-import {baseInfoUseStore} from "@/store/project_store.js";
-import {useRouter} from "vue-router";
-import store from "store2";
+import { reactive } from 'vue'
+import { loginOperation } from '@/axios/requestList'
+import { useRouter } from 'vue-router'
+import store from 'store2'
 
-
-const baseInfoStore = baseInfoUseStore();
-const router = useRouter();
-
+const router = useRouter()
 const loginItem = reactive({
   userName: '',
   password: ''
-});
+})
 
 const loginOperate = async () => {
   const result = await loginOperation(loginItem)
-  const {code, message, token} = result;
+  const { code, message, token } = result
   if (code === '4001' || code === '4004') {
-    alert(message);
+    alert(message)
   }
   if (code === '200') {
     // 这里进行跳转，并且存储token
-    store.set('token', token);
-    await router.push({path: '/list'});
+    store.set('token', token)
+    await router.push({ path: '/list' })
   }
-};
+}
 </script>
 
 <template>

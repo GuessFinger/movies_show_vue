@@ -1,55 +1,48 @@
 <script setup>
-import {Swiper, SwiperSlide} from 'swiper/vue';
-import {Pagination} from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import {onMounted, reactive, watch} from "vue";
-import {useRoute, useRouter} from "vue-router";
-import {queryPerformerListById} from "@/axios/requestList.js";
-import {performerHotUseStore} from "@/store/project_store.js";
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Pagination } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/pagination'
+import { onMounted, reactive, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { queryPerformerListById } from '@/axios/requestList'
+import { performerHeatUseStore } from '@/store/heat-store'
 
-const modules = [Pagination];
-const router = useRouter();
-const route = useRoute();
-const productList = reactive([]);
-const hotUseStore = performerHotUseStore();
-
-// 获取当前的swiper对象
-let swiperObject;
+const router = useRouter()
+const route = useRoute()
+const productList = reactive([])
+const hotUseStore = performerHeatUseStore()
+const modules = [Pagination]
 
 onMounted(() => {
-  queryPerformerProductListById(route.params.id);
-});
-
-const queryPerformerProductListById = async (id) => {
-  const result = await queryPerformerListById(id);
-  if (result.code === 200) {
-    productList.length = 0;
-    productList.push(...result.data);
-  }
-  if (result.code === 404) {
-    alert(result.data);
-    await router.push({path: '/'});
-  }
-};
+  queryPerformerProductListById(route.params.id)
+})
 
 // 如果通过修改URL的id，需要查看是否有存储过
 watch(() => route.params.id, () => {
-  queryPerformerProductListById(route.params.id);
-});
+  queryPerformerProductListById(route.params.id)
+})
+
+const queryPerformerProductListById = async (id) => {
+  const result = await queryPerformerListById(id)
+  if (result.code === 200) {
+    productList.length = 0
+    productList.push(...result.data)
+  }
+  if (result.code === 404) {
+    alert(result.data)
+    await router.push({ path: '/' })
+  }
+}
 
 const showSynopsisPhoto = (num) => {
-  router.push({name: 'product', params: {num}});
-  hotUseStore.addHot(route.params.id, 3);
-};
-
-const onSwiper = (swiper) => {
-  swiperObject = swiper;
-};
+  router.push({ name: 'product', params: { num } })
+  hotUseStore.addHot(route.params.id, 3)
+}
 
 const swiperChange = () => {
-  router.push({name: 'performer', params: {id: route.params.id}});
-};
+  router.push({ name: 'performer', params: { id: route.params.id } })
+}
 
 </script>
 <template>
@@ -60,7 +53,6 @@ const swiperChange = () => {
     <swiper
         :pagination="{dynamicBullets: true}"
         :modules="modules"
-        @swiper="onSwiper"
         @slideChange="swiperChange"
         class="mySwiper"
     >
@@ -128,6 +120,5 @@ const swiperChange = () => {
   justify-content: center;
   border: 1px solid gray;
 }
-
 
 </style>

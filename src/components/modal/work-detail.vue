@@ -1,23 +1,24 @@
 <script setup>
-import {reactive, watch} from "vue";
-import {queryPerformerDetailByName, savePerformerInfo} from "@/axios/requestList.js";
+import { reactive, watch } from 'vue'
+import { queryPerformerDetailByName, savePerformerInfo } from '@/axios/requestList.js'
 
-const visibleObject = defineProps(['visible', 'performerName']);
-const emits = defineEmits(['handleOk', 'resetList']);
+const visibleObject = defineProps(['visible', 'performerName'])
+const emits = defineEmits(['handleOk', 'resetList'])
 
-let productionList = reactive([]);
-let failLoadList = reactive([]);
+const productionList = reactive([])
+const failLoadList = reactive([])
 
 watch(() => visibleObject.performerName, async () => {
   try {
-    const [successList, failList] = await queryPerformerDetailByName(visibleObject.performerName);
-    productionList.length = 0;
-    productionList.push(...successList);
-    failLoadList.push(...failList);
+    const [successList, failList] = await queryPerformerDetailByName(visibleObject.performerName)
+    productionList.length = 0
+    failLoadList.length = 0
+    productionList.push(...successList)
+    failLoadList.push(...failList)
   } catch (error) {
     // todo 错误的话，有一个提示
   }
-});
+})
 
 const savePerformer = () => {
   savePerformerInfo({
@@ -26,10 +27,10 @@ const savePerformer = () => {
   }).then(res => {
     if (res?.code === 200) {
       // 关闭当前窗口 然后重置查询动作
-      emits('resetList');
+      emits('resetList')
     }
-  });
-};
+  })
+}
 
 </script>
 
@@ -58,7 +59,7 @@ const savePerformer = () => {
                 <span>发型年份: {{ item.release }}</span>
               </div>
               <div style="padding-top: 10px">
-                <a-tag color="red" v-for="(item,index) in item.tag">
+                <a-tag color="red" v-for="(item,index) in item.tag" :key="index">
                   {{ item }}
                 </a-tag>
               </div>
